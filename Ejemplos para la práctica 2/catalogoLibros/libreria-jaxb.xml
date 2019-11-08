@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:libreria xmlns:ns2="modelo">
+    <listaLibros>
+        <libro>
+            <autor>Neil Strauss</autor>
+            <titulo>El Juego</titulo>
+            <editorial>Harpercollins</editorial>
+            <isbn>978-0060554736</isbn>
+        </libro>
+        <libro>
+            <autor>Charlotte Roche</autor>
+            <titulo>Zonas humedas</titulo>
+            <editorial>Dumont Buchverlag</editorial>
+            <isbn>978-3832180577</isbn>
+        </libro>
+    </listaLibros>
+    <nombre>Frankfurt Bookstore</nombre>
+    <ubicacion>Aeropuerto de Frankfurt</ubicacion>
+</ns2:libreria>

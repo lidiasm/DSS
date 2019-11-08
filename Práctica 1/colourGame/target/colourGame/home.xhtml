@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"   
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core">
+	<h:head>
+		<title>Colour Quizz Game</title>		   
+	</h:head>
+	<h:body style="padding:15px"> 
+		<h:form>
+			<h2 style="color:#{controladorJuego.colorPregunta}">#{controladorJuego.textoTituloJuego}</h2>
+			<h3 style="color:#{controladorJuego.colorPregunta}">#{controladorJuego.textoInstrucciones}</h3>
+			
+			<h3>Ejemplo de pregunta:</h3>
+			<h4 style="color:#{controladorJuego.colorPregunta}; margin-left:50px">#{controladorJuego.textoPregunta}</h4>
+			<h:commandButton
+				id="btnRespuesta1"
+				value="#{controladorJuego.textoRespuesta1}"
+				style="color:#{controladorJuego.colorRespuesta};background:#{controladorJuego.colorBtnRespuesta1};
+					font-weight:bold; padding: 10px; margin:15px; margin-left:70px; width:100px"
+			/>
+			<h:commandButton
+				id="btnRespuesta2"
+				value="#{controladorJuego.textoRespuesta2}"
+				style="color:#{controladorJuego.colorRespuesta};background:#{controladorJuego.colorBtnRespuesta2};
+					font-weight:bold; padding:10px; margin: 15px; width:100px"
+			/>
+			<br/>
+			<h:commandButton
+				id="btnRespuesta3"
+				value="#{controladorJuego.textoRespuesta3}"
+				style="color:#{controladorJuego.colorRespuesta};background:#{controladorJuego.colorBtnRespuesta3};
+					font-weight:bold; padding: 10px; margin:15px; margin-left:70px; width:100px"
+			/>
+			<h:commandButton
+				id="btnRespuesta4"
+				value="#{controladorJuego.textoRespuesta4}"
+				style="color:#{controladorJuego.colorRespuesta};background:#{controladorJuego.colorBtnRespuesta4};
+					font-weight:bold; padding: 10px; margin:15px; width:100px"
+			/>
+			<br/>
+			<h4 style="color:#{controladorJuego.colorPregunta}">#{controladorJuego.textoRespuestaEjemplo}</h4>
+			<!-- Navegación hacia adelante. -->
+			<!-- Botón que redirecciona a la página donde se plantean las preguntas. -->
+			<h:commandButton 
+				id="btnComenzar"
+				action="game" 
+				value="#{controladorJuego.textoComenzar}"
+				style="color:#{controladorJuego.colorTextoComenzar};background:#{controladorJuego.colorBtnComenzar};
+					font-weight:bold; padding: 10px; margin:15px"/>
+		</h:form>
+	 </h:body>
+</html>

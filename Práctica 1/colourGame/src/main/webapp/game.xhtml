@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"   
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core">
+	<h:head>
+		<title>Colour Quizz Game</title>		   
+	</h:head>
+	<h:body style="padding:15px"> 
+		<h:form>
+			<h2 style="color:#{controladorJuego.colorPregunta}">#{controladorJuego.textoTituloJuego}</h2>
+			<hr/>
+			<h4 style="color:#{controladorJuego.colorPregunta}">#{controladorJuego.numeroPregunta}. #{controladorJuego.textoPregunta}</h4>
+			<h:commandButton
+				id="btnRespuesta1"
+				value="#{controladorJuego.textoRespuesta1}"
+				style="color:#{controladorJuego.colorRespuesta};background:#{controladorJuego.colorBtnRespuesta1};
+					font-weight:bold; padding: 10px; margin:15px; width:100px"
+				actionListener="#{controladorJuego.clickBtnRespuesta1}"
+			/>
+			<h:commandButton
+				id="btnRespuesta2"
+				value="#{controladorJuego.textoRespuesta2}"
+				style="color:#{controladorJuego.colorRespuesta};background:#{controladorJuego.colorBtnRespuesta2};
+					font-weight:bold; padding:10px; margin: 15px; width:100px"
+				actionListener="#{controladorJuego.clickBtnRespuesta2}"
+			/>
+			<br/>
+			<h:commandButton
+				id="btnRespuesta3"
+				value="#{controladorJuego.textoRespuesta3}"
+				style="color:#{controladorJuego.colorRespuesta};background:#{controladorJuego.colorBtnRespuesta3};
+					font-weight:bold; padding: 10px; margin:15px; width:100px"
+				actionListener="#{controladorJuego.clickBtnRespuesta3}"
+			/>
+			<h:commandButton
+				id="btnRespuesta4"
+				value="#{controladorJuego.textoRespuesta4}"
+				style="color:#{controladorJuego.colorRespuesta};background:#{controladorJuego.colorBtnRespuesta4};
+					font-weight:bold; padding: 10px; margin:15px; width:100px"
+				actionListener="#{controladorJuego.clickBtnRespuesta4}"
+			/>
+			<br/>
+			<h4 style="color:#{controladorJuego.colorTextoResultado}">#{controladorJuego.textoResultado}</h4>
+			<!-- Botón que permite ir a la pregunta anterior-->
+			<h:commandButton 
+				id="btnAnterior"
+				value="#{controladorJuego.textoPreguntaAnterior}"
+				style="color:#{controladorJuego.colorPregunta};background:#{controladorJuego.colorRespuesta};
+				 font-weight:bold; padding: 5px; margin:15px"
+				actionListener="#{controladorJuego.preguntaAnterior}"
+			/>
+			<!-- Botón que permite ir a la siguiente pregunta -->
+			<h:commandButton
+				id="btnSiguiente"
+				value="#{controladorJuego.textoPreguntaSiguiente}"
+				style="color:#{controladorJuego.colorPregunta};background:#{controladorJuego.colorRespuesta};
+					font-weight:bold; padding: 5px; margin:15px"
+				actionListener="#{controladorJuego.preguntaSiguiente}"
+			/>
+			<h4 style="color:#{controladorJuego.colorNumeroAciertos}; font-weight:bold;">
+				Resultado actual: #{controladorJuego.numeroAciertos} aciertos de #{controladorJuego.numeroPreguntas} preguntas.</h4>
+			<br/>
+			<!-- Reglas de navegación -->
+			<!-- Botón que permite terminar el juego -->
+			<h:commandLink style="color:#{controladorJuego.colorRespuesta};
+				background:#{controladorJuego.colorPregunta};font-weight:bold; 
+				padding:5px; margin:55px; text-decoration:none;" 
+				action="#{controladorJuego.terminarJuego}" value="TERMINAR JUEGO" 
+				actionListener="#{controladorJuego.calcularPuntuacion}"
+			/>
+		</h:form>
+	 </h:body>
+</html>

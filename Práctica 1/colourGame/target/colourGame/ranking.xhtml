@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"   
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core">
+	<h:head>
+		<title>Colour Quizz Game</title>		   
+	</h:head>
+	<h:body style="padding:15px"> 
+		<h:form>
+			<h2 style="color:#{controladorJuego.colorPregunta}">#{controladorJuego.textoTituloJuego}</h2>
+			<hr/>
+			<h3 style="color:#{controladorJuego.colorPregunta}">#{controladorJuego.textoTituloRanking}</h3>
+			<h4 style="color:#{controladorJuego.colorPregunta}">#{controladorJuego.textoRanking}</h4>
+			<!-- Navegación implícita. -->
+			<!-- Botón que redirecciona a la página de inicio -->
+			<h:commandButton 
+				action="home" 
+				value="INICIO DEL JUEGO" 
+				style="color:#{controladorJuego.colorTextoComenzar};background:#{controladorJuego.colorBtnComenzar};
+					font-weight:bold; padding: 10px; margin:15px"
+			/>
+		</h:form>
+	</h:body>
+</html>
