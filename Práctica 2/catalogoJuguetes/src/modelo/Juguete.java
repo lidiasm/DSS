@@ -10,7 +10,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class Juguete {
 	@Id
 	@GeneratedValue(strategy = GenerationType.TABLE)
-	private int id;
+	private String id;
 	private String nombre;
 	private String descripcion;
 	private int minEdadRecomendada;
@@ -24,11 +24,19 @@ public class Juguete {
 		this.minEdadRecomendada = minEdadRecomendada;
 		this.precio = precio;
 	}
+	
+	public Juguete(String id, String nombre, String descripcion, int minEdadRecomendada, double precio) {
+		this.id = id;
+		this.nombre = nombre;
+		this.descripcion = descripcion;
+		this.minEdadRecomendada = minEdadRecomendada;
+		this.precio = precio;
+	}
 
-	public int getId() {
+	public String getId() {
 		return id;
 	}
-	public void setId(int id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 	

@@ -1,129 +1,192 @@
 package cliente;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
-import javax.swing.JFrame;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.UriBuilder;
 
-import dao.*;
-import modelo.*;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
-public class ClienteJava extends javax.swing.JFrame {
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.client.config.ClientConfig;
+import com.sun.jersey.api.client.config.DefaultClientConfig;
+import com.sun.jersey.api.representation.Form;
+import com.sun.org.apache.xerces.internal.parsers.DOMParser;
 
-	private static final long serialVersionUID = 1L;
-	private List<Juguete> juguetes;
-	private javax.swing.JButton botonIniciarSesion;
-    private javax.swing.JPanel panelListadoJuguetes;
-    private javax.swing.JPanel panelPrincipal;
-    private javax.swing.JScrollPane panelScroll;
-    private javax.swing.JLabel tituloVista;
-    private ListaJuguetes listaJuguetes;
-    
-    public ListaJuguetes getLista() {return listaJuguetes;}
+public class ClienteJava {
 	
-	public ClienteJava() {
-		juguetes = new ArrayList<Juguete>((JugueteDao.INSTANCE).getJuguetes());
-		initComponents();
+	private static List<Integer>idsJuguetes;
+
+	public static void main(String[] args) throws IOException, SAXException {
+		System.out.println("Bievenido al catálogo de Juguetes.");
+		System.out.println("¿Con qué rol desea iniciar la sesión?");
+		System.out.println("1) Usuario\n2) Administrador");
+		System.out.print("Introduzca el número del rol deseado: ");
+		Scanner es = new Scanner(System.in);
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		int rol = 0;
+		// Cliente
+		ClientConfig config = new DefaultClientConfig();
+		Client cliente = Client.create(config);
+		WebResource servicio = cliente.resource(getBaseURI());
+		
+		while (rol != 1 && rol != 2) {
+			rol = es.nextInt();
+			switch(rol) {
+			case 1:
+				System.out.println("Ha iniciado sesión como usuario");
+				System.out.println("\nCatálogo de juguetes");
+				String catalogo = servicio.path("rest").path("juguetes").
+					accept(MediaType.TEXT_XML).get(String.class);
+				mostrarCatalogoJuguetes(catalogo);
+				break;
+			case 2:
+				System.out.println("\nHa iniciado sesión como administrador");
+				System.out.println("¿Qué desea hacer?");
+				System.out.println("1) Añadir un juguete\n2) Eliminar un juguete\n3) Consultar el catálogo de juguetes");
+				System.out.print("Escoja una de las opciones anteriores: ");
+				int opcionAdministrador = 0;
+				while (opcionAdministrador < 1 || opcionAdministrador > 3) {
+					opcionAdministrador = es.nextInt();
+					switch(opcionAdministrador) {
+					case 1:
+						System.out.println("Añadir un nuevo juguete.");
+						System.out.print("Introduzca el nombre del juguete: ");
+						String nombreJuguete = "";
+						nombreJuguete = br.readLine();
+						while (nombreJuguete == "") {
+							System.out.print("Introduzca el nombre del juguete: ");
+							nombreJuguete = br.readLine();
+						}
+						
+						System.out.print("Introduzca la descripción del juguete: ");
+						String descripcion = "";
+						descripcion = br.readLine();
+						while (descripcion == "") {
+							System.out.print("Introduzca la descripcion del juguete: ");
+							descripcion = br.readLine();
+						}
+						
+						System.out.print("Introduzca una edad mínima para el juguete: ");
+						int minEdadRecomendada = -1;
+						if (es.hasNextInt()) minEdadRecomendada = es.nextInt();
+						else es.next();
+						while (minEdadRecomendada < 0) {
+							System.out.print("Introduzca una edad mínima para el juguete: ");
+							if (es.hasNextInt()) minEdadRecomendada = es.nextInt();
+							else es.next();
+						}
+						
+						System.out.print("Introduzca el precio del juguete (los decimales se separan con una coma): ");
+						double precio = 0.0;
+						if (es.hasNextDouble()) precio = es.nextDouble();
+						else es.next();
+						while (precio <= 0.0) {
+							System.out.print("Introduzca el precio del juguete (los decimales se separan con una coma): ");
+							if (es.hasNextDouble()) precio = es.nextDouble();
+							else es.next();
+						}
+						
+						Form form = new Form();
+						form.add("nombre", nombreJuguete);
+						form.add("descripcion", descripcion);
+						form.add("minEdadRecomendada", minEdadRecomendada);
+						form.add("precio", precio);
+						ClientResponse respuestaCliente = servicio.path("rest").path("juguetes").
+							type(MediaType.APPLICATION_FORM_URLENCODED).post(ClientResponse.class, form);
+						System.out.println("Juguete añadido correctamente.");
+						System.out.println("Catálogo actualizado.");
+						String catalogoActualizado = servicio.path("rest").path("juguetes").
+								accept(MediaType.TEXT_XML).get(String.class);
+						mostrarCatalogoJuguetes(catalogoActualizado);
+						break;
+					case 2:
+						catalogo = servicio.path("rest").path("juguetes").
+							accept(MediaType.TEXT_XML).get(String.class);
+						obtenerIdsJuguetes(catalogo);
+						System.out.println("Identificadores de los juguetes actuales: " + idsJuguetes.toString());
+						System.out.print("Introduzca el id del juguete a borrar: ");
+						int idJugueteABorrar = es.nextInt();
+						while (!idsJuguetes.contains(idJugueteABorrar)) {
+							System.out.print("Por favor, introduzca un id válido para borrar el juguete: ");
+							idJugueteABorrar = es.nextInt();
+						}
+						servicio.path("rest").path("juguetes/"+Integer.toString(idJugueteABorrar)).delete();
+						System.out.println("Borrado el juguete con identificador = " + idJugueteABorrar);
+						System.out.println("Catálogo de juguetes actual");
+						String catalogoTrasBorrado = servicio.path("rest").path("juguetes").
+								accept(MediaType.TEXT_XML).get(String.class);
+						mostrarCatalogoJuguetes(catalogoTrasBorrado);
+						break;
+					case 3:
+						String catalogoAdministrador = servicio.path("rest").path("juguetes").
+						accept(MediaType.TEXT_XML).get(String.class);
+						mostrarCatalogoJuguetes(catalogoAdministrador);
+						break;
+					}
+				}
+				break;
+			default:
+				System.out.print("Opción incorrecta. Por favor, introduzca una de las opciones anteriores: ");
+				break;
+			}
+		}
 	}
 	
-    private void initComponents() {
-    	panelScroll = new javax.swing.JScrollPane();
-        panelPrincipal = new javax.swing.JPanel();
-        tituloVista = new javax.swing.JLabel();
-        botonIniciarSesion = new javax.swing.JButton();
-        panelListadoJuguetes = new javax.swing.JPanel();
+	private static void obtenerIdsJuguetes(String catalogo) throws SAXException, IOException {
+		DOMParser parser = new DOMParser();
+		parser.parse(new InputSource(new java.io.StringReader(catalogo)));
+	    Document doc = parser.getDocument();
+	    doc.getDocumentElement().normalize();
+	    NodeList listaXML = doc.getElementsByTagName("juguete");
+	    idsJuguetes = new ArrayList<Integer>();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-
-        tituloVista.setFont(new java.awt.Font("Bodoni MT", 1, 20)); // NOI18N
-        tituloVista.setText("Catálogo de juguetes.");
-
-        botonIniciarSesion.setText("Iniciar sesión");
-
-        javax.swing.GroupLayout panelListadoJuguetesLayout = new javax.swing.GroupLayout(panelListadoJuguetes);
-        panelListadoJuguetes.setLayout(panelListadoJuguetesLayout);
-        panelListadoJuguetesLayout.setHorizontalGroup(
-            panelListadoJuguetesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
-        );
-        panelListadoJuguetesLayout.setVerticalGroup(
-            panelListadoJuguetesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 224, Short.MAX_VALUE)
-        );
-
-        javax.swing.GroupLayout panelPrincipalLayout = new javax.swing.GroupLayout(panelPrincipal);
-        panelPrincipal.setLayout(panelPrincipalLayout);
-        panelPrincipalLayout.setHorizontalGroup(
-            panelPrincipalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelPrincipalLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(panelPrincipalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(panelListadoJuguetes, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(panelPrincipalLayout.createSequentialGroup()
-                        .addComponent(tituloVista)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 90, Short.MAX_VALUE)
-                        .addComponent(botonIniciarSesion)))
-                .addGap(51, 51, 51))
-        );
-        panelPrincipalLayout.setVerticalGroup(
-            panelPrincipalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panelPrincipalLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(panelPrincipalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(tituloVista)
-                    .addComponent(botonIniciarSesion))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(panelListadoJuguetes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(29, Short.MAX_VALUE))
-        );
-
-        panelScroll.setViewportView(panelPrincipal);
-        // Catálogo de juguetes
-        listaJuguetes = new ListaJuguetes(juguetes);
-    	JTable tablaJuguetes = new JTable(listaJuguetes); 
-        panelScroll.add(tablaJuguetes);
-
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(panelScroll, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(panelScroll, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
-        );
-
-        
-        pack();
-    }
+	    for(int elem = 0; elem < listaXML.getLength(); elem++) {
+    	  Node nodo = listaXML.item(elem);
+    	  if(nodo.getNodeType() == Node.ELEMENT_NODE) {
+    	    Element e = (Element) nodo;
+    	    idsJuguetes.add(Integer.parseInt(e.getElementsByTagName("id").item(0).getTextContent()));
+    	  }
+	    }
+	}
 	
-	public static void main(String[] args) {
-        // TODO code application logic here
-        ClienteJava cliente = new ClienteJava();
-        JTable tablaJuguetes = new JTable(cliente.getLista()); 
-        cliente.getContentPane().add(new JScrollPane(tablaJuguetes), "Center");
-        cliente.setSize(800,800);
-        cliente.setVisible(true);
-        
-        /*JFrame frame = new JFrame("FileTableDemo"); 
-        frame.getContentPane().add(new JScrollPane(tablaJuguetes), "Center"); 
-        frame.setSize(600, 400); 
-        frame.setVisible(true);
-			*/
-		/*JFrame frame = new JFrame();
-	    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	private static void mostrarCatalogoJuguetes(String catalogo) throws SAXException, IOException {
+		DOMParser parser = new DOMParser();
+		parser.parse(new InputSource(new java.io.StringReader(catalogo)));
+	    Document doc = parser.getDocument();
+	    doc.getDocumentElement().normalize();
+	    NodeList listaXML = doc.getElementsByTagName("juguete");
 
-	    Object rowData[][] = { { "Row1-Column1", "Row1-Column2", "Row1-Column3" },
-	        { "Row2-Column1", "Row2-Column2", "Row2-Column3" } };
-	    Object columnNames[] = { "Column One", "Column Two", "Column Three" };
-	    JTable table = new JTable(rowData, columnNames);
-
-	    JScrollPane scrollPane = new JScrollPane(table);
-	    frame.add(scrollPane, BorderLayout.CENTER);
-	    frame.setSize(300, 150);
-	    frame.setVisible(true);*/
-
-    }
+	    for(int elem = 0; elem < listaXML.getLength(); elem++) {
+    	  Node nodo = listaXML.item(elem);
+    	  if(nodo.getNodeType() == Node.ELEMENT_NODE) {
+    	    Element e = (Element) nodo;
+    	    System.out.println("\nNombre del juguete: "+e.getElementsByTagName("nombre").
+    	    	item(0).getTextContent());
+    	    System.out.println("Descripción del juguete: "+e.getElementsByTagName("descripcion").
+	    	    	item(0).getTextContent());
+    	    System.out.println("Edad mínima: "+e.getElementsByTagName("minEdadRecomendada").
+	    	    	item(0).getTextContent());
+    	    System.out.println("Precio del juguete: "+e.getElementsByTagName("precio").
+	    	    	item(0).getTextContent());
+    	  }
+	    }
+	}
+	
+	private static URI getBaseURI() {
+		return UriBuilder.fromUri("http://localhost:8080/catalogoJuguetes/").build();
+	}
 }

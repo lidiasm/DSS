@@ -5,7 +5,6 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.NoResultException;
 import javax.persistence.Persistence;
 import javax.persistence.Query;
 
@@ -17,16 +16,36 @@ public enum JugueteDao {
 	private EntityManagerFactory factoria = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME);
 	
 	private JugueteDao() {
-		crearJuguete("Barbie", "Muñeca", 3, 53.99);
+		crearJuguete("Barbie", "Muñeca con ropero", 3, 53.99);
 		crearJuguete("Batman", "Muñeco de acción", 5, 68.99);
+		crearJuguete("Nancy", "Muñeca", 2, 85.99);
+		crearJuguete("Nenuco", "Muñeco bebé", 2, 35.55);
+		crearJuguete("Cocinita", "Horno y cacharros", 4, 123.99);
+		crearJuguete("Bebé llorón", "Muñeco bebé que llora de verdad", 5, 55.66);
+		crearJuguete("Pony", "Muñeco animal", 3, 69.99);
+		crearJuguete("Superman", "Muñeco del hombre araña", 2, 20.99);
+		crearJuguete("Coche teledirigido", "Coche de juguete", 5, 69.99);
+		crearJuguete("Scalextric", "Pista de coches", 7, 140.59);
 	}
 
 	public Juguete crearJuguete(String nombre, String descripcion, int minEdadRecomendada, double precio) {
+		Juguete nuevoJuguete = null;
 		EntityManager em = factoria.createEntityManager();
 		em.getTransaction().begin();   // Nueva transacción
-		Juguete nuevoJuguete = new Juguete(nombre, descripcion, minEdadRecomendada, precio);
-		em.persist(nuevoJuguete);
-		em.getTransaction().commit();	// Salvar la entidad en la bd
+		boolean existeJuguete = false;
+		List<Juguete> juguetesActuales = getJuguetes();
+		for (Juguete juguete: juguetesActuales) {
+			if (juguete.getNombre().equals(nombre) && juguete.getDescripcion().equals(descripcion) &&
+					juguete.getMinEdadRecomendada() == minEdadRecomendada && juguete.getPrecio() == precio) {
+				existeJuguete = true;
+				break;
+			}
+		}
+		if (!existeJuguete) {
+			nuevoJuguete = new Juguete(nombre, descripcion, minEdadRecomendada, precio);
+			em.persist(nuevoJuguete);
+			em.getTransaction().commit();	// Salvar la entidad en la bd
+		}
 		em.close();   // Cerrar el gestor de entidades
 		return nuevoJuguete;
 	}
@@ -40,32 +59,14 @@ public enum JugueteDao {
 		return juguetes;
 	}
 	
-	public boolean eliminarJuguete(String nombre, String descripcion, int minEdadRecomendada, double precio) {
-		boolean jugueteEliminado = false;
+	public void eliminarJuguete(String id) {
 		EntityManager em = factoria.createEntityManager();
 		em.getTransaction().begin();   // Nueva transacción
-		Query q = em.createQuery("select j from Juguete j where j.nombre = :nombre AND "
-				+ "j.descripcion = :descripcion AND j.minEdadRecomendada = :minEdadRecomendada AND "
-				+ "j.precio = :precio");
-		// Ahora asigno los parámetros
-		q.setParameter("nombre", nombre);
-		q.setParameter("descripcion", descripcion);
-		q.setParameter("minEdadRecomendada", minEdadRecomendada);
-		q.setParameter("precio", precio);
-
-		try {
-		    Juguete juguete = (Juguete) q.getSingleResult(); // Obtener el juguete a borrar
-		    em.remove(juguete);	// Eliminar el juguete
-		    em.getTransaction().commit(); // Confirmar la eliminación de la entidad
-		    List<Juguete> juguetesActuales = getJuguetes();
-		    try {
-		    	Juguete jugueteBorrado = (Juguete) q.getSingleResult();
-		    }catch(NoResultException e) {	// Excepción que sucede cuando el objeto se ha encontrado y borrado
-		    	jugueteEliminado = true;
-		    }
-		}catch(NoResultException e) {	// Excepción si no existe el objeto a borrar
-	    }
+		Query q = em.createQuery("select j from Juguete j where j.id = :id");
+		q.setParameter("id", id);
+		Juguete juguete = (Juguete) q.getSingleResult(); // Obtener el juguete a borrar
+	    em.remove(juguete);	// Eliminar el juguete
+	    em.getTransaction().commit(); // Confirmar la eliminación de la entidad
 	    em.close();	// Cerrar gestor de entidades
-	    return jugueteEliminado;
 	}
 }
