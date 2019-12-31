@@ -51,7 +51,7 @@ public class ClienteJava {
 				System.out.println("\nCatálogo de juguetes");
 				String catalogo = servicio.path("rest").path("juguetes").
 					accept(MediaType.TEXT_XML).get(String.class);
-				mostrarCatalogoJuguetes(catalogo);
+				mostrarCatalogoJuguetes(catalogo, false);
 				break;
 			case 2:
 				System.out.println("\nHa iniciado sesión como administrador");
@@ -105,13 +105,13 @@ public class ClienteJava {
 						form.add("descripcion", descripcion);
 						form.add("minEdadRecomendada", minEdadRecomendada);
 						form.add("precio", precio);
-						ClientResponse respuestaCliente = servicio.path("rest").path("juguetes").
+						ClientResponse respuestaCliente = servicio.path("rest").path("juguetes").path("crearJugueteForm").
 							type(MediaType.APPLICATION_FORM_URLENCODED).post(ClientResponse.class, form);
 						System.out.println("Juguete añadido correctamente.");
 						System.out.println("Catálogo actualizado.");
 						String catalogoActualizado = servicio.path("rest").path("juguetes").
 								accept(MediaType.TEXT_XML).get(String.class);
-						mostrarCatalogoJuguetes(catalogoActualizado);
+						mostrarCatalogoJuguetes(catalogoActualizado, true);
 						break;
 					case 2:
 						catalogo = servicio.path("rest").path("juguetes").
@@ -129,12 +129,12 @@ public class ClienteJava {
 						System.out.println("Catálogo de juguetes actual");
 						String catalogoTrasBorrado = servicio.path("rest").path("juguetes").
 								accept(MediaType.TEXT_XML).get(String.class);
-						mostrarCatalogoJuguetes(catalogoTrasBorrado);
+						mostrarCatalogoJuguetes(catalogoTrasBorrado, true);
 						break;
 					case 3:
 						String catalogoAdministrador = servicio.path("rest").path("juguetes").
 						accept(MediaType.TEXT_XML).get(String.class);
-						mostrarCatalogoJuguetes(catalogoAdministrador);
+						mostrarCatalogoJuguetes(catalogoAdministrador, true);
 						break;
 					}
 				}
@@ -163,7 +163,7 @@ public class ClienteJava {
 	    }
 	}
 	
-	private static void mostrarCatalogoJuguetes(String catalogo) throws SAXException, IOException {
+	private static void mostrarCatalogoJuguetes(String catalogo, boolean admin) throws SAXException, IOException {
 		DOMParser parser = new DOMParser();
 		parser.parse(new InputSource(new java.io.StringReader(catalogo)));
 	    Document doc = parser.getDocument();
@@ -174,6 +174,10 @@ public class ClienteJava {
     	  Node nodo = listaXML.item(elem);
     	  if(nodo.getNodeType() == Node.ELEMENT_NODE) {
     	    Element e = (Element) nodo;
+    	    if (admin) {
+    	    	System.out.print("\nID del juguete: "+e.getElementsByTagName("id").
+	    	    	item(0).getTextContent());
+    	    }
     	    System.out.println("\nNombre del juguete: "+e.getElementsByTagName("nombre").
     	    	item(0).getTextContent());
     	    System.out.println("Descripción del juguete: "+e.getElementsByTagName("descripcion").
@@ -182,6 +186,8 @@ public class ClienteJava {
 	    	    	item(0).getTextContent());
     	    System.out.println("Precio del juguete: "+e.getElementsByTagName("precio").
 	    	    	item(0).getTextContent());
+    	    System.out.println("Nombre del almacén: "+e.getElementsByTagName("nombreAlmacen").
+        	    	item(0).getTextContent());
     	  }
 	    }
 	}

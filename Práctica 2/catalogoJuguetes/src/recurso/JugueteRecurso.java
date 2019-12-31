@@ -60,7 +60,7 @@ public class JugueteRecurso {
 		Juguete jugueteBuscado = JugueteDao.INSTANCE.getJuguetes().get(Integer.parseInt(nuevoJuguete.getId()));
 		if (jugueteBuscado != null) respuesta = Response.noContent().build();
 		else respuesta = Response.created(uriInfo.getAbsolutePath()).build();
-		JugueteDao.INSTANCE.crearJuguete(nuevoJuguete.getNombre(), nuevoJuguete.getDescripcion(),
+		JugueteDao.INSTANCE.crearJuguete("Almacén 1", nuevoJuguete.getNombre(), nuevoJuguete.getDescripcion(),
 				nuevoJuguete.getMinEdadRecomendada(), nuevoJuguete.getPrecio());
 		return respuesta;
 	}

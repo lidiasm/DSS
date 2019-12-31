@@ -33,7 +33,7 @@ public class JuguetesRecurso {
 	public String getCatalogoJuguetesUsuario() {
 		List<Juguete> juguetes = JugueteDao.INSTANCE.getJuguetes();
 		String catalogo = "<table>"+"<tr>"+"<td>Juguete</td>"+"<td style='padding-left:60px'>Descripción</td>"+
-			"<td>Mín. edad recomendada</td>"+"<td style='padding:20px'>Precio</td>"+"</tr>";
+			"<td>Mín. edad recomendada</td>"+"<td style='padding:20px'>Precio</td>"+"<td style='padding:20px'>Almacén</td>"+"</tr>";
 
 		for (Juguete juguete: juguetes) {
 			catalogo += "<tr>";
@@ -41,6 +41,7 @@ public class JuguetesRecurso {
 			catalogo += "<td style='padding-left:50px'>"+juguete.getDescripcion()+"</td>";
 			catalogo += "<td style='padding-left:100px'>"+juguete.getMinEdadRecomendada()+"</td>";
 			catalogo += "<td style='padding-left:20px'>"+juguete.getPrecio()+"€</td>";
+			catalogo += "<td style='padding-left:20px'>"+juguete.getNombreAlmacen()+"</td>";
 			catalogo += "</tr>";
 		}
 		catalogo += "</table>";
@@ -54,15 +55,17 @@ public class JuguetesRecurso {
 		List<Juguete> juguetes = JugueteDao.INSTANCE.getJuguetes();
 		String catalogo = "<a style='font-size:20px;background-color: antiquewhite;color: black;padding: 14px 10px;"+
 				"text-align: center;text-decoration: none; float:right;' href='crear_juguete.html'>Añadir juguete.</a>";
-		catalogo += "<table>"+"<tr>"+"<td>Juguete</td>"+"<td style='padding-left:60px'>Descripción</td>"+
-			"<td>Mín. edad recomendada</td>"+"<td style='padding:20px'>Precio</td>"+"</tr>";
+		catalogo += "<table>"+"<tr>"+"<td>ID</td>"+"<td style='padding-left:60px'>Juguete</td>"+"<td style='padding-left:60px'>Descripción</td>"+
+			"<td>Mín. edad recomendada</td>"+"<td style='padding:20px'>Precio</td>"+"<td style='padding:20px'>Almacén</td>"+"</tr>";
 
 		for (Juguete juguete: juguetes) {
 			catalogo += "<tr>";
-			catalogo += "<td>"+juguete.getNombre()+"</td>";
+			catalogo += "<td>"+juguete.getId()+"</td>";
+			catalogo += "<td style='padding-left:50px'>"+juguete.getNombre()+"</td>";
 			catalogo += "<td style='padding-left:50px'>"+juguete.getDescripcion()+"</td>";
 			catalogo += "<td style='padding-left:100px'>"+juguete.getMinEdadRecomendada()+"</td>";
 			catalogo += "<td style='padding-left:20px'>"+juguete.getPrecio()+"€</td>";
+			catalogo += "<td style='padding-left:20px'>"+juguete.getNombreAlmacen()+"</td>";
 			catalogo += "<td style='padding-left:20px'>"
 				+ "<a style='background-color: #d8e9f1;color: black;text-align: center;text-decoration: none;' "
 				+ "href='http://localhost:8080/catalogoJuguetes/borrarJuguete?id="+juguete.getId()+"'>Borrar</a></td>";
@@ -93,26 +96,61 @@ public class JuguetesRecurso {
 	}
 
 	@POST
-	@Produces(MediaType.TEXT_HTML)
+	@Path("crearJugueteRest")
+	@Produces(MediaType.TEXT_XML)
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-	public void newJuguete(
+	public String newJugueteRest(
 		@FormParam("nombre") String nombre,
 		@FormParam("descripcion") String descripcion,
-		@FormParam("minEdadRecomendada") int minEdadRecomendada,
-		@FormParam("precio") double precio,
+		@FormParam("minEdadRecomendada") String minEdadRecomendada,
+		@FormParam("precio") String precio,
 		@Context HttpServletResponse servletResponse) throws IOException {
+		int minimaEdad = Integer.parseInt(minEdadRecomendada);
+		double pr = Double.parseDouble(precio);
+		List<Juguete> juguetesActuales = JugueteDao.INSTANCE.getJuguetes();
+		boolean existeJuguete = false;
+		String resultado = "";
+		for (Juguete juguete: juguetesActuales) {
+			if (juguete.getNombre().equals(nombre) && juguete.getDescripcion().equals(descripcion)
+					&& juguete.getMinEdadRecomendada() == minimaEdad && juguete.getPrecio() == pr) {
+				existeJuguete = true;
+				resultado = "El juguete ya existe.";
+				break;
+			}
+		}
+		if (!existeJuguete) {
+			resultado = "El juguete se ha insertado correctamente.";
+			Juguete nuevoJuguete = JugueteDao.INSTANCE.crearJuguete("Almacén 1", nombre, descripcion, minimaEdad, pr);
+			if (nuevoJuguete == null) resultado = "El juguete no se ha podido insertar.";
+		}
+		
+		return resultado;
+	}
+	
+	@POST
+	@Path("crearJugueteForm")
+	@Produces(MediaType.TEXT_HTML)
+	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+	public void newJugueteForm(
+		@FormParam("nombre") String nombre,
+		@FormParam("descripcion") String descripcion,
+		@FormParam("minEdadRecomendada") String minEdadRecomendada,
+		@FormParam("precio") String precio,
+		@Context HttpServletResponse servletResponse) throws IOException {
+		int minimaEdad = Integer.parseInt(minEdadRecomendada);
+		double pr = Double.parseDouble(precio);
 		List<Juguete> juguetesActuales = JugueteDao.INSTANCE.getJuguetes();
 		boolean existeJuguete = false;
 		for (Juguete juguete: juguetesActuales) {
 			if (juguete.getNombre().equals(nombre) && juguete.getDescripcion().equals(descripcion)
-					&& juguete.getMinEdadRecomendada() == minEdadRecomendada && juguete.getPrecio() == precio) {
+					&& juguete.getMinEdadRecomendada() == minimaEdad && juguete.getPrecio() == pr) {
 				existeJuguete = true;
 				break;
 			}
 		}
 		if (!existeJuguete) {
-			JugueteDao.INSTANCE.crearJuguete(nombre, descripcion, minEdadRecomendada, precio);
-			servletResponse.sendRedirect("../crear_juguete.html");
+			JugueteDao.INSTANCE.crearJuguete("Almacén 1", nombre, descripcion, minimaEdad, pr);
+			servletResponse.sendRedirect("http://localhost:8080/catalogoJuguetes/crear_juguete.html");
 		}
 	}
 
@@ -124,7 +162,6 @@ public class JuguetesRecurso {
 	@DELETE
 	@Path("eliminar/{idJuguete}")
 	public String eliminarJuguete(
-		@PathParam("eliminar") String op,
 		@PathParam("idJuguete") String id) {
 		JugueteRecurso juguete = new JugueteRecurso(uriInfo, request, id);
 		juguete.eliminarJuguete();

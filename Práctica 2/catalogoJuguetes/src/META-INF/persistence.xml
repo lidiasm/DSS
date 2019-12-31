@@ -6,9 +6,10 @@
 	<persistence-unit name="juguetes" transaction-type="RESOURCE_LOCAL">
 		<provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
 		<class>modelo.Juguete</class>
+		<class>modelo.Almacen</class>
 		<properties>
 			<property name="javax.persistence.jdbc.driver" value="org.apache.derby.jdbc.EmbeddedDriver" />
-			<property name="javax.persistence.jdbc.url" value="jdbc:derby:/home/lidia/bdsJuguetes;create=true" />
+			<property name="javax.persistence.jdbc.url" value="jdbc:derby:/home/lidia/bdsJuguetes2;create=true" />
 			<property name="javax.persistence.jdbc.user" value="toy" />
 			<property name="javax.persistence.jdbc.password" value="toy" />
 

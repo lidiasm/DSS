@@ -15,18 +15,21 @@ public class Juguete {
 	private String descripcion;
 	private int minEdadRecomendada;
 	private double precio;
+	private String nombreAlmacen;
 	
 	public Juguete() {}
 	
-	public Juguete(String nombre, String descripcion, int minEdadRecomendada, double precio) {
+	public Juguete(String nombreAlmacen, String nombre, String descripcion, int minEdadRecomendada, double precio) {
 		this.nombre = nombre;
 		this.descripcion = descripcion;
 		this.minEdadRecomendada = minEdadRecomendada;
 		this.precio = precio;
+		this.nombreAlmacen = nombreAlmacen;
 	}
 	
-	public Juguete(String id, String nombre, String descripcion, int minEdadRecomendada, double precio) {
+	public Juguete(String id, String nombreAlmacen, String nombre, String descripcion, int minEdadRecomendada, double precio) {
 		this.id = id;
+		this.nombreAlmacen = nombreAlmacen;
 		this.nombre = nombre;
 		this.descripcion = descripcion;
 		this.minEdadRecomendada = minEdadRecomendada;
@@ -38,6 +41,14 @@ public class Juguete {
 	}
 	public void setId(String id) {
 		this.id = id;
+	}
+	
+	public String getNombreAlmacen() {
+		return nombreAlmacen;
+	}
+	
+	public void setNombreAlmacen(String nombreAlmacen) {
+		this.nombreAlmacen = nombreAlmacen;
 	}
 	
 	public String getNombre() {
@@ -70,6 +81,6 @@ public class Juguete {
 	
 	public String toString() {
 		return "\nJuguete: " + nombre + "\nDescripción: " + descripcion
-			+ "\nMínima edad: " + minEdadRecomendada + "\nPrecio: " + precio;
+			+ "\nMínima edad: " + minEdadRecomendada + "\nPrecio: " + precio + "\nNombre del almacén: " + nombreAlmacen;
 	}
 }
