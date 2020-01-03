@@ -40,6 +40,16 @@ public class JugueteRecurso {
 	
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
+	@Path("almacen/{id}")
+	public String getAllFromStore(@PathParam("id") String id) throws Exception {
+		int ideAlmacen = Integer.parseInt(id);
+		Juguete j = JugueteDao.get(DbConnection.getConnection(), ideAlmacen);
+		String json = new Gson().toJson(j);
+	    return json;
+	}
+	
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{id}")
 	public String getOne(
 		@PathParam("id") String id

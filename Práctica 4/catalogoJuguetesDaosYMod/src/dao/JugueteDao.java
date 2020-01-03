@@ -13,6 +13,23 @@ public class JugueteDao {
 	///////////////////////////// CAMBIAR desription POR descripcion!!!!!!!!!!!!!!!!!!!!!!!!///////////////////////////
 	////////////////////////////
 	///////////////////////
+	public static ArrayList<Juguete> getAll(Connection connection, int id) throws Exception {
+		try {
+			ArrayList<Juguete> l = new ArrayList<Juguete>();
+			PreparedStatement ps = connection.prepareStatement("SELECT * FROM juguete WHERE almacen = ?");
+			ps.setInt(1, id);
+			ResultSet rs = ps.executeQuery();
+			while (rs.next()) {
+				Juguete j = new Juguete(rs.getInt("id"), rs.getString("nombre"), rs.getString("desripcion"), 
+						rs.getInt("minEdadRecomendada"), rs.getDouble("precio"), rs.getInt("almacen"), rs.getInt("unidades"));
+				l.add(j);
+			}
+			return l;
+		} catch (Exception e) {
+			throw e;
+		}
+	}
+	
 	public static ArrayList<Juguete> getAll(Connection connection) throws Exception {
 		try {
 			ArrayList<Juguete> l = new ArrayList<Juguete>();
