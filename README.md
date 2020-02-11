@@ -7,7 +7,7 @@
 * Ejercicio del **seminario 1**. Especificación de la operación *IHotelMgt::makeReservation()* utilizando como lenguaje UML/OCL.
 * Ejercicio del **seminario 4**. Especificación de un modelo basado en ontologías de la web semántica utilizando como lenguaje OWL.
 
-## Prácticas
+### Prácticas
 
 * **Práctica 1**. Desarrollo de una interfaz cliente utilizando el *framework JSF* y *JavaBeans* en la que se visualicen cambios de color en botones, textos, etc. así como distintos mecanismos de redirecciones a páginas.
 
